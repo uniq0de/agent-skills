@@ -9,24 +9,29 @@ Search and filters appear together inside the CardHeader of a listing page. They
 
 ## Search Input
 
-Always use a relative container to position the search icon absolutely, with left-padded input.
+In Material UI listing pages, use `TextField` with `InputAdornment` for the search icon.
 
 ```tsx
-<div className="relative">
-  <Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
-  <Input
-    placeholder="Search records..."
-    value={searchQuery}
-    onChange={(e) => setSearchQuery(e.target.value)}
-    className="pl-9 w-full sm:w-64"
-  />
-</div>
+<TextField
+  size="small"
+  placeholder="Search tasks..."
+  value={searchDraft}
+  onChange={(e) => setSearchDraft(e.target.value)}
+  InputProps={{
+    startAdornment: (
+      <InputAdornment position="start">
+        <SearchIcon fontSize="small" sx={{ color: "text.secondary" }} />
+      </InputAdornment>
+    ),
+  }}
+  sx={{ minWidth: { xs: "100%", sm: 240 } }}
+/>
 ```
 
-- Icon: `size-4`, color `text-muted-foreground`
-- Input: `pl-9` (leaves room for icon), fixed width `sm:w-64` on desktop, `w-full` on mobile
-- Placeholder: "Search [entity]..." always lowercase after "Search"
-- Search is always real-time (no submit button)
+- Icon is rendered via `InputAdornment` (not absolute positioning)
+- Search field is full width on mobile and fixed min width on `sm+`
+- Placeholder should be entity-specific (`Search tasks...`, `Search users...`)
+- Search is real-time; no submit button
 
 ## Filter Pills
 

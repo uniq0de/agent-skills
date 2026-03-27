@@ -1,13 +1,17 @@
 ---
 name: frontend-dashboard
-description: Golden guideline for designing CRM overview/dashboard pages with stat cards, activity feeds, and quick actions. Use when building a home page, overview, or summary page for a CRM, admin panel, or operations dashboard.
+description: Golden guideline for designing dashboard pages. Includes stat-card overview dashboards and Material UI management dashboards with grouped content, tabs, and tables. Use when building a home page, overview, summary page, or data-management interface in a CRM, admin panel, or operations dashboard.
 ---
 
 # Frontend Dashboard Design Guideline
 
-The dashboard is the first page users see. It must immediately communicate the state of the system and provide fast paths to the most common actions.
+The dashboard communicates system state and provides fast paths to common actions. This skill covers two primary patterns: stat-card overviews and management dashboards.
 
-## Mobile-First Layout Strategy
+## Pattern 1: Stat-Card Overview Dashboard
+
+The stat-card dashboard is the first page users see in metrics-heavy applications. It immediately communicates the state of the system with visual stat cards, activity feeds, and quick actions.
+
+### Mobile-First Layout Strategy
 
 The dashboard renders two entirely separate layouts — one for mobile, one for desktop. Both are built in the same component, using `md:hidden` and `hidden md:block` to toggle them.
 
@@ -30,7 +34,7 @@ The dashboard renders two entirely separate layouts — one for mobile, one for 
 </div>
 ```
 
-## Mobile Stat Grid (4-column icon tiles)
+### Mobile Stat Grid (4-column icon tiles)
 
 On mobile, stats are compact icon tiles in a 4-column grid. Each tile shows icon, label, and a bold number:
 
@@ -52,7 +56,7 @@ On mobile, stats are compact icon tiles in a 4-column grid. Each tile shows icon
 
 The `active:scale-95` provides a tactile press effect on touch devices.
 
-## Mobile Quick Actions (full-width buttons)
+### Mobile Quick Actions (full-width buttons)
 
 Two buttons below the stat grid for the most important primary actions:
 
@@ -75,7 +79,7 @@ Two buttons below the stat grid for the most important primary actions:
 
 Both buttons are `flex-1` (equal width) and `h-12` (tall enough for thumb tap).
 
-## Desktop Page Header
+### Desktop Page Header
 
 The desktop header has a welcome text left, and action buttons right:
 
@@ -98,7 +102,7 @@ The desktop header has a welcome text left, and action buttons right:
 </div>
 ```
 
-## Desktop Stat Cards (hover-interactive)
+### Desktop Stat Cards (hover-interactive)
 
 Each stat card is fully clickable and features a hover animation on its icon:
 
@@ -124,7 +128,7 @@ Each stat card is fully clickable and features a hover animation on its icon:
 
 The `group` class enables `group-hover:` effects on children. The icon scales up, the action text darkens, and the chevron nudges right — all on hover.
 
-## Stat Color System
+### Stat Color System
 
 Define stats with semantic color classes. Use brand-specific colors for variety, not arbitrary ones:
 
@@ -139,7 +143,7 @@ const stats = [
 
 Always pair a dark-mode variant: `text-color-600 dark:text-color-400`. Background uses `/10` opacity.
 
-## Activity Feed Cards
+### Activity Feed Cards
 
 The bottom section uses two side-by-side cards (stacked on mobile):
 
@@ -166,7 +170,7 @@ Each card has a "View All" link in the header:
 </CardHeader>
 ```
 
-## Color-Coded List Items
+### Color-Coded List Items
 
 Use a left-border accent stripe to color-code items by type without overwhelming the card:
 
@@ -180,7 +184,7 @@ Use a left-border accent stripe to color-code items by type without overwhelming
 </Link>
 ```
 
-## Rules
+### Stat Dashboard Rules
 
 - Always show exactly 4 stat cards — not 3, not 5. This fills the 4-column grid perfectly.
 - Stat values must be real computed numbers from live data — never hardcoded.
@@ -188,4 +192,123 @@ Use a left-border accent stripe to color-code items by type without overwhelming
 - Desktop CTA buttons in the header: primary action uses default style, secondary uses `variant="outline" className="bg-transparent"`.
 - Never use `text-balance` except on the H1 heading.
 - The welcome subtitle ("Welcome back! Here's your overview.") humanizes the interface — always include it.
+
+---
+
+## Pattern 2: Management Dashboard (Material UI)
+
+Management dashboards present grouped data sets with filtering, search, and tabbed views for lifecycle states. This pattern uses Material UI components and is appropriate for admin/CRUD interfaces.
+
+### Framework Baseline
+
+Use Material UI primitives: `Box`, `Typography`, `Button`, `Tabs`, `Tab`, `TextField`, `Dialog`, `InputAdornment`.
+
+### Page Composition
+
+```tsx
+<PageContainer>
+  {/* 1. Page header: title + contextual subtitle + primary CTA */}
+  {/* 2. TableCard: section header + search + tabs + list/table content */}
+  {/* 3. Dialogs: create/edit/manage/confirm actions */}
+</PageContainer>
+```
+
+### Page Header (Title + Contextual Subtitle + Primary Action)
+
+Keep title/subtitle on the left and one primary action button on the right:
+
+```tsx
+<Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 2 }}>
+  <Box>
+    <Typography variant="h5" component="h1" sx={{ fontWeight: 700 }}>
+      Task Management
+    </Typography>
+    <Typography variant="body2" color="text.secondary">
+      Manage task definitions, assignments, versions, and lifecycle status.
+    </Typography>
+  </Box>
+  <Button variant="contained" color="primary" startIcon={<AddIcon />}>
+    New Task
+  </Button>
+</Box>
+```
+
+**Subtitle guideline**: Must be contextual to the page domain (e.g., "Manage task definitions..."), not a fixed greeting.
+
+### Grouped Listing Container (TableCard)
+
+Group all list content into one `TableCard` with clear internal sections:
+
+```tsx
+<TableCard sx={{ p: { xs: 1.5, md: 2 } }}>
+  {/* section header: entity title + visible count + search */}
+  {/* tabs: grouped data views */}
+  {/* table/list content area */}
+</TableCard>
+```
+
+### Tabs for Grouped Record Sets
+
+Use tabs when records share one schema but differ by lifecycle or state:
+
+```tsx
+<Tabs value={selectedTab} onChange={handleTabChange}>
+  <Tab label="Active tasks" value="active" />
+  <Tab label="Recycling Bin" value="recycleBin" />
+</Tabs>
+```
+
+Recommended behavior:
+- Clear search input on tab switch when each tab has separate datasets.
+- Show per-tab counts and per-tab empty states.
+- Keep tabs inside the listing container, immediately above content.
+
+### Search Input (Material UI)
+
+Use `TextField` with `InputAdornment` for the search icon:
+
+```tsx
+<TextField
+  size="small"
+  placeholder="Search tasks..."
+  value={searchDraft}
+  onChange={(e) => setSearchDraft(e.target.value)}
+  InputProps={{
+    startAdornment: (
+      <InputAdornment position="start">
+        <SearchIcon fontSize="small" sx={{ color: "text.secondary" }} />
+      </InputAdornment>
+    ),
+  }}
+  sx={{ minWidth: { xs: "100%", sm: 240 } }}
+/>
+```
+
+### Action Buttons (Material UI)
+
+- Primary create action: `variant="contained" color="primary"`
+- Secondary actions: `variant="outlined"` or text variant
+- Use `startIcon` for button icons instead of inline classes
+
+### Management Dashboard Rules
+
+- This pattern is listing-first; stat-card-only layouts belong in Pattern 1.
+- Subtitles must be contextual to the page domain, not fixed greeting strings.
+- Keep grouped data states in tabs within one container instead of separate page sections.
+- Prefer one clear primary CTA in the page header.
+
+---
+
+## Selection Guide
+
+**Use Pattern 1 (Stat-Card Overview)** when:
+- Building a dashboard that emphasizes metrics and KPIs
+- Users need a high-level overview before diving into details
+- You want hero stat cards with activity feeds
+
+**Use Pattern 2 (Management Dashboard)** when:
+- Building a CRUD/admin interface for managing records
+- Data has lifecycle states (active, archived, deleted) that benefit from tabs
+- Users primarily search and filter rather than scan metrics
+- Using Material UI as your component library
 ```

@@ -14,22 +14,34 @@ Blueprint reference: `frontend-dashboard/table-sample.tsx`.
 Centered vertically and horizontally within `CardContent`, with a muted icon, clear heading, and context-aware message:
 
 ```tsx
-<div className="flex flex-col items-center justify-center py-12 text-center">
-  <EntityIcon className="size-12 text-muted-foreground/50 mb-4" />
-  <h3 className="text-lg font-medium">No records found</h3>
-  <p className="text-muted-foreground">
-    {searchQuery || activeFilter !== 'all'
-      ? 'Try adjusting your filters'
-      : 'Add records to track history'}
-  </p>
-</div>
+<Box
+  sx={{
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "center",
+    justifyContent: "center",
+    py: 6,
+    px: 2,
+  }}
+>
+  <AssignmentIcon sx={{ fontSize: 60, color: "text.secondary", mb: 2 }} />
+  <Typography variant="h6" color="text.secondary" sx={{ mb: 1 }}>
+    No active tasks yet
+  </Typography>
+  <Typography variant="body2" color="text.secondary" sx={{ mb: 3, maxWidth: 300 }}>
+    Create your first task to get started managing task definitions and versions.
+  </Typography>
+  <Button variant="contained" color="primary">
+    Create Task
+  </Button>
+</Box>
 ```
 
 Key details:
-- Icon: `size-12` (48px), `text-muted-foreground/50` (half opacity). Always the entity's icon, not a generic empty box.
-- `py-12`: generous vertical padding to center it within the card.
-- Heading: `text-lg font-medium` — not bold, not small.
-- Message: always context-aware. Two states: "filter active" vs "truly empty".
+- Use MUI layout and typography primitives for consistency with listing pages.
+- Keep icon + heading + body copy vertically centered.
+- Support two message types: "no data exists" and "filtered/no matches".
+- Include a primary recovery action when the empty state represents a first-run experience.
 
 ## Card-List Empty State (Medical Records Pattern)
 
@@ -155,6 +167,6 @@ Suggestion chips: `variant="outline" size="sm" className="bg-transparent"`. They
 
 - The empty state icon is always the entity's own icon, not a generic placeholder. For appointments: `Calendar`. For pets: `PawPrint`. For messages: `MessageSquare`.
 - Icon opacity is always `text-muted-foreground/50` — never full opacity, never lower than `/40`.
-- Never show a "Create your first X" button inside the empty state of a listing page — the primary CTA button is in the page header. The empty state only shows instructional text.
+- Allow a primary CTA button in empty state when first-run onboarding benefits from an immediate action.
 - Loading state is shown at the page level (before the Card), not inside the table body.
 - Always guard the not-found state before rendering any layout on detail pages.

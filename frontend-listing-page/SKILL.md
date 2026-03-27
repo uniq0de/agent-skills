@@ -63,6 +63,46 @@ Wrap the entire table (including search/filters) in a single Card. The CardHeade
 
 The `CardDescription` shows a **live filtered count** — always update it as filters change, never show the total static count.
 
+## TableCard Wrapper Pattern (Management Pages)
+
+For management pages implemented in Material UI, use `TableCard` as the listing shell and split it into: (1) section header, (2) tabs, (3) content.
+
+```tsx
+<TableCard sx={{ p: { xs: 1.5, md: 2 } }}>
+  <Box
+    sx={{
+      py: { xs: 1.5, md: 2 },
+      display: "flex",
+      alignItems: { xs: "flex-start", sm: "center" },
+      justifyContent: "space-between",
+      flexDirection: { xs: "column", sm: "row" },
+      gap: 1.5,
+      borderBottom: "1px solid",
+      borderColor: "divider",
+    }}
+  >
+    <Box>
+      <Typography variant="subtitle2" sx={{ fontWeight: 700 }}>
+        Task Records
+      </Typography>
+      <Typography variant="body2" color="text.secondary">
+        {visibleCountLabel}
+      </Typography>
+    </Box>
+    <SearchField />
+  </Box>
+
+  <Tabs value={selectedTab} onChange={handleTabChange}>
+    <Tab label="Active tasks" value="active" />
+    <Tab label="Recycling Bin" value="recycleBin" />
+  </Tabs>
+
+  {/* table or empty state for selected tab */}
+</TableCard>
+```
+
+Use this pattern when a single entity type needs grouped lifecycle views (active, archived, deleted) in one page.
+
 ## Responsive Table
 
 Wrap the table in `overflow-x-auto`. Use progressive column hiding to adapt to screen width:
