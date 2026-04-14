@@ -207,6 +207,23 @@ This is **the most important factor** in tool performance.
 - Guide agents toward valid inputs
 - Suggest filters/pagination when result too large
 
+### Client-Safe Error Messaging
+- Always return an **actionable message** that tells the client what to do next
+- Never pass raw backend/internal errors directly to clients
+- Sanitize implementation details (stack traces, SQL errors, internal service names)
+- Preserve details in server logs/telemetry, but expose only safe guidance to clients
+
+**Example:**
+```
+DO:
+  "Unable to move this message because the destination folder was not found.
+   Verify the folder name or list available folders and try again."
+
+DON'T:
+  "graph API 404: ErrorItemNotFound at messageService.MoveMessage(...)
+   stack=.../internal/services/message.go:88"
+```
+
 ---
 
 ## Developer Checklist {#checklist}
